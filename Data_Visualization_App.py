@@ -36,7 +36,6 @@ if uploaded_file is not None:
     data = pd.read_excel(uploaded_file, sheet_name=sheet)
 
     # If the selected sheet is 'Mechanical_Raw_data' and 'Date' column exists, convert it to datetime and extract the month in 'YYYY-MM' format
-    #if sheet == sheet_names[0] or sheet == sheet_names[1] and 'Date' in data.columns:
     if ('Raw' in sheet or 'DPTM' in sheet) and 'Date' in data.columns:
         data['Date'] = pd.to_datetime(data['Date'], format='%Y%m%d')
         data['Date'] = data['Date'].dt.strftime('%Y-%m-%d')
@@ -99,7 +98,19 @@ if uploaded_file is not None:
     lsl = stats_summary.loc[stats_summary['Measurements'] == selected_column, 'LSL'].values[0]
 
     # Create a box plot
-    colors = ['rgb(7,40,89)', 'rgb(9,56,125)', 'rgb(8,81,156)', 'rgb(107,174,214)']
+    # Create a box plot
+    colors = ['rgb(102, 31, 54)', 'rgb(7,40,89)', 'rgb(30, 99, 63)', 'rgb(9,56,125)', 'rgb(8,81,156)', 'rgb(107,174,214)', 'rgb(147,112,219)', 'rgb(155,135,12)', 'rgb(255,165,0)']
+    color_names = {
+        'rgb(102, 31, 54)': 'Dark Maroon',
+        'rgb(7,40,89)': 'Very Dark Blue',
+        'rgb(30, 99, 63)': 'Dark Green',
+        'rgb(9,56,125)': 'Dark Blue',
+        'rgb(8,81,156)': 'Medium Blue',
+        'rgb(107,174,214)': 'Light Sky Blue',
+        'rgb(147,112,219)': 'Medium Purple',
+        'rgb(155,135,12)': 'Dark Yellow',
+        'rgb(255,165,0)': 'Medium Orange'
+    }
     unique_dates = melted_data['Date'].unique()
     # Get the column names
     col2_column_names = stats_summary.columns.tolist()
@@ -118,8 +129,17 @@ if uploaded_file is not None:
         marker_size = st.slider('Marker Size: 3 ~ default', 1, 10, 3, key='marker_size')
         line_width = st.slider('Line Width: 1 ~ default', 1, 10, 1, key='line_width')
         pointpos = st.slider('Point Position: -1.8 ~ default', -2.0, 2.0, -1.8, key='pointpos')
-        boxpoints_options = ['outliers','all', 'suspectedoutliers']
+        boxpoints_options = [False,'outliers','all', 'suspectedoutliers']
         boxpoints = st.selectbox('Box Points: all ~ default', boxpoints_options, index=1, key='boxpoints')
+        # Create a multiselect widget for the colors
+        with st.expander('Choose Box-Plot colors:', expanded=False):
+            # Get a list of color names
+            color_name_list = list(color_names.values())
+            #Use the first two color names as the default
+            default_colors= color_name_list[:2]
+            selected_color_names = st.multiselect('Select colors', color_name_list, default=default_colors, key='box-plot1')
+            # Convert the selected color names back to RGB values
+            selected_colors = [rgb for rgb, name in color_names.items() if name in selected_color_names]
         if st.button('Reset Chart Effects'):
             jitter = 0.3
             whiskerwidth = 0.2
@@ -127,6 +147,7 @@ if uploaded_file is not None:
             line_width = 1
             pointpos = -1.8
             boxpoints = 'all'
+            selected_colors=colors
         # Create a box plot in the first column
     with col1:
         selected_dates = st.multiselect('Select dates:', unique_dates, default=unique_dates, key= 'box1 dates')
@@ -147,8 +168,8 @@ if uploaded_file is not None:
                 marker_size=marker_size,
                 line_width=line_width,
                 pointpos=pointpos,
-                marker_color=colors[date_to_index[date] % len(colors)],
-                line_color=colors[date_to_index[date] % len(colors)]
+                marker_color=selected_colors[date_to_index[date] % len(selected_colors)],
+                line_color=selected_colors[date_to_index[date] % len(selected_colors)]
             ))
         # Add horizontal lines for USL and LSL
         all_parts = melted_data['Part'].unique()
@@ -296,8 +317,17 @@ if uploaded_file is not None:
         marker_size = st.slider('Marker Size: 3 ~ default', 1, 10, 3, key='marker_size_1')
         line_width = st.slider('Line Width: 1 ~ default', 1, 10, 1, key='line_width_1')
         pointpos = st.slider('Point Position: -1.8 ~ default', -2.0, 2.0, -1.8, key='pointpos_1')
-        boxpoints_options = ['outliers','all', 'suspectedoutliers']
+        boxpoints_options = [False, 'outliers','all', 'suspectedoutliers']
         boxpoints = st.selectbox('Box Points: all ~ default', boxpoints_options, index=1, key='boxpoints_1')
+        # Create a multiselect widget for the colors
+        with st.expander('Choose Box-Plot colors:', expanded=False):
+            # Get a list of color names
+            color_name_list = list(color_names.values())
+            #Use the first two color names as the default
+            default_colors_1= color_name_list[2:4]
+            selected_color_names = st.multiselect('Select colors', color_name_list, default=default_colors_1, key='box-plot2')
+            # Convert the selected color names back to RGB values
+            selected_colors = [rgb for rgb, name in color_names.items() if name in selected_color_names]
         if st.button('Reset Chart Effects', key='chart_2'):
             jitter = 0.3
             whiskerwidth = 0.2
@@ -305,6 +335,7 @@ if uploaded_file is not None:
             line_width = 1
             pointpos = -1.8
             boxpoints = 'all'
+            selected_colors = colors 
     # Create a box plot in the first column
     with col1:
         selected_dates = st.multiselect('Select dates:', unique_dates, default=unique_dates, key= 'box2 dates')
@@ -324,8 +355,8 @@ if uploaded_file is not None:
                 marker_size=marker_size,
                 line_width=line_width,
                 pointpos=pointpos,
-                marker_color=colors[date_to_index[date] % len(colors)],
-                line_color=colors[date_to_index[date] % len(colors)]
+                marker_color=selected_colors[date_to_index[date] % len(selected_colors)],
+                line_color=selected_colors[date_to_index[date] % len(selected_colors)]
             ))
         # Add horizontal lines for USL and LSL
         all_parts = melted_data_1['Part_Type'].unique()
