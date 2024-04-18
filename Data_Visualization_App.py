@@ -7,7 +7,7 @@ from io import StringIO, BytesIO
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title='Gentex PP1', layout='wide')
+st.set_page_config(page_title='PP1 Data App', layout='wide')
 st.title('PP1 Data Web App 📈')
 st.subheader('Feed me with the transformed file')
 
