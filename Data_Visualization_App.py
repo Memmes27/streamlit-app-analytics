@@ -8,8 +8,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 st.set_page_config(page_title='Gentex PP1', layout='wide')
-st.title('Gentex PP1 Data Web App 📈')
-st.subheader('Feed me with the transformed Excel file')
+st.title('PP1 Data Web App 📈')
+st.subheader('Feed me with the transformed file')
 
 uploaded_file = st.file_uploader('Choose a XLSX file', type='xlsx')
 
